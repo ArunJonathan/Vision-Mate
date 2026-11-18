@@ -1,0 +1,69 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function: Check if user is signed in
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    // Helper function: Get user document
+    function getUser(uid) {
+      return get(/databases/$(database)/documents/users/$(uid));  // 🆕 FIXED: database (was datAabase)
+    }
+    
+    // Helper function: Check if requester is a linked helper for the seeker
+    function isLinkedHelperFor(seekerUid) {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/users/$(seekerUid))
+        && (request.auth.uid in getUser(seekerUid).data.helpers);
+    }
+    
+    // Users collection: Own data + allow fcmToken updates
+    match /users/{uid} {
+      allow create: if isSignedIn() && request.auth.uid == uid;
+      allow read, update: if isSignedIn() && request.auth.uid == uid;
+      allow list: if false;
+    }
+    
+    // SOS Requests: Seeker creates/reads; helpers read/update if linked
+    match /sos_requests/{sosId} {
+      allow create: if isSignedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasAll(['uid', 'status', 'timestamp'])
+        && request.resource.data.status == 'pending';
+      
+      allow read: if isSignedIn() && (
+        resource.data.uid == request.auth.uid ||
+        isLinkedHelperFor(resource.data.uid)
+      );
+      
+      allow update: if isSignedIn() && (
+        (request.auth.uid == resource.data.uid &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['location', 'battery', 'batteryLow'])) ||
+        
+        (isLinkedHelperFor(resource.data.uid) &&
+         ((resource.data.status == 'pending' && request.resource.data.status == 'accepted') ||
+          (resource.data.status == 'accepted' && request.resource.data.status == 'completed')))
+      );
+      
+      allow delete: if false;
+      
+      // Messages subcollection
+      match /messages/{messageId} {
+        allow read: if isSignedIn() && (
+          get(/databases/$(database)/documents/sos_requests/$(sosId)).data.uid == request.auth.uid ||
+          isLinkedHelperFor(get(/databases/$(database)/documents/sos_requests/$(sosId)).data.uid)
+        );
+        
+        allow create: if isSignedIn() && (
+          request.resource.data.keys().hasAll(['text', 'senderId', 'timestamp']) &&
+          request.resource.data.senderId == request.auth.uid &&
+          (get(/databases/$(database)/documents/sos_requests/$(sosId)).data.uid == request.auth.uid ||
+           isLinkedHelperFor(get(/databases/$(database)/documents/sos_requests/$(sosId)).data.uid))
+        );
+        
+        allow update, delete: if false;
+      }
+    }
+  }
+}

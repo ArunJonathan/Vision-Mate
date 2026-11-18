@@ -1,0 +1,57 @@
+name: visionmate
+description: A Flutter app for visually impaired users with SOS features.
+publish_to: 'none'
+version: 1.1.0+2
+
+environment:
+  sdk: '>=3.5.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  firebase_core: ^3.15.2  # Held for stability
+  firebase_auth: ^5.7.0   # Held
+  firebase_messaging: ^15.2.10  # Held
+  cloud_firestore: ^5.6.12  # Held
+  cloud_functions: ^5.6.2  # Held
+  geolocator: ^14.0.2  # No outdated flag; keep
+  sensors_plus: ^7.0.0  # Upgraded: Safe, just constraints
+  flutter_tts: ^4.0.0  # No outdated; keep
+  battery_plus: ^7.0.0  # Upgraded: Minor build tweaks
+  http: ^1.2.2  # No outdated; keep
+  googleapis_auth: ^2.0.0  # Upgraded: Dep updates
+  googleapis: ^14.0.0  # Upgraded: API additions
+  share_plus: ^12.0.0  # Upgraded: Refactor for newer Flutter
+  flutter_dotenv: ^6.0.0  # No outdated; keep
+  speech_to_text: ^7.0.0  # No outdated; keep
+  google_maps_flutter: ^2.9.0  # No outdated; keep
+  flutter_local_notifications: ^17.0.0
+  audioplayers: ^6.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_native_splash: ^2.4.1  # Latest stable
+
+flutter:
+  uses-material-design: true
+  assets:
+    - .env
+    - assets/splash.png  # Ensure your logo image is here
+
+# Splash screen configuration (top-level, outside of flutter:)
+flutter_native_splash:
+  # Background color of the splash screen
+  color: "#ffffff"
+  # Path to your image asset (centered on splash)
+  image: assets/splash.png
+  # Enable for Android
+  android: true
+  # Enable for iOS
+  ios: true
+  # Optional: Full-screen mode (Android 12+ compatible)
+  fullscreen: true
+  # Optional: Dark mode support (uncomment and add dark config if needed)
+  # color_dark: "#121212"
+  # image_dark: assets/splash_dark.png

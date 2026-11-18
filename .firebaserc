@@ -1,0 +1,9 @@
+{
+  "projects": {
+    "default": "vision-mate-9793c",
+    "new": "vision-mate-9793c",
+    "production": "vision-mate-9793c"
+  },
+  "targets": {},
+  "etags": {}
+}

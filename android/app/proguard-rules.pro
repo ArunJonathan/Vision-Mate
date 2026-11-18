@@ -1,0 +1,5 @@
+-keep class com.google.firebase.** { *; }
+-keep class com.google.android.gms.** { *; }
+-keep class io.flutter.plugins.** { *; }
+-keep class com.baseflow.geolocator.** { *; }
+-keep class com.github.sososdk.battery_plus.** { *; }
